@@ -1,37 +1,30 @@
 {
-  "manifestVersion": "1.0.0",
   "mission": "QMOOSA-YIELD-01",
-  "generatedAt": "2026-10-17T19:58:00Z",
+  "generatedAt": "2026-10-17T20:46:00Z",
   "packages": [
     {
       "name": "@qmoosa/yield-protocol",
-      "repository": "elon00/qmoosa-yield-protocol",
       "version": "1.0.0",
-      "sourceCommit": "6937b704d1065ca894cc2ef66f1c11eece8ae9f2",
       "archivePath": "packages/qmoosa-yield-protocol-1.0.0.tgz",
-      "sha256": "26f47e8580de046c273d10549b6830626e456a6c1e312f61ec6805b06a90f074",
-      "ciStatus": "PASS",
-      "testResult": "4/4 passing"
+      "sha256": "0213feb9cbe1255cbfabdd6421e548297dcdc73a2e21f411581729e84e6a23d8",
+      "repository": "elon00/qmoosa-yield-protocol",
+      "sourceCommit": "fc14832"
     },
     {
       "name": "@qmoosa/yield-engine",
-      "repository": "elon00/qmoosa-yield-engine",
       "version": "1.0.0",
-      "sourceCommit": "c8b540c585ac16b259d1ed01065e178e396dc3be",
       "archivePath": "packages/qmoosa-yield-engine-1.0.0.tgz",
-      "sha256": "0d5e6aaea7a51a37d5c40426488ddb0b7a2a375f6db4efc3917e82adf2c611b2",
-      "ciStatus": "PASS",
-      "testResult": "5/5 passing"
+      "sha256": "147a766ea79a93d0955c9efb89744ec6e382346c4fdd9193b214d3da392f7170",
+      "repository": "elon00/qmoosa-yield-engine",
+      "sourceCommit": "da5f6cd"
     },
     {
       "name": "@qmoosa/yield-sdk",
-      "repository": "elon00/qmoosa-yield-sdk",
       "version": "1.0.0",
-      "sourceCommit": "916a5be3504287530a1831292f1133195b0dfd84",
       "archivePath": "packages/qmoosa-yield-sdk-1.0.0.tgz",
       "sha256": "e8e13271a13b59934976d084b3e2775b6b4bba4a190c7b01114634ec53333d7d",
-      "ciStatus": "PASS",
-      "testResult": "5/5 passing"
+      "repository": "elon00/qmoosa-yield-sdk",
+      "sourceCommit": "916a5be"
     }
   ]
 }

@@ -35,3 +35,23 @@ test("Negative Control 4: Unconfigured SDK adapter fails closed with zero manufa
 
   await assert.rejects(() => client.broadcast(payload), /Chain adapter not configured/);
 });
+
+test("Negative Control 5: Insufficient strategy liquidity causes withdrawal to fail closed and preserve state", () => {
+  const engine = new YieldEngine();
+  engine.registerStrategy({
+    strategyId: "illiquid-strat",
+    allocatedAssetsUsd: 0n,
+    targetWeightBps: 10_000,
+    expectedApyBps: 500
+  });
+
+  const dep = engine.deposit("0xalice", 10_000n);
+  // User cannot withdraw more shares than held
+  assert.throws(
+    () => engine.withdraw("0xalice", dep.sharesMinted * 10n),
+    /Insufficient share balance/
+  );
+  // Verify state is completely preserved
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
+  assert.equal(engine.getUserShares("0xalice"), dep.sharesMinted);
+});

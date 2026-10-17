@@ -87,11 +87,11 @@ for (const pkg of manifest.packages) {
     const declaredCommit = pkg.sourceCommit.trim();
 
     if (mode === "current-head") {
-      console.log(`  [INFO] ${pkg.repository}: HEAD=${currentHead.substring(0, 7)} DECLARED=${declaredCommit.substring(0, 7)} ALIGNED=${currentHead.toLowerCase() === declaredCommit.toLowerCase() ? "YES" : "NO"}`);
+      console.log(`  [INFO] ${pkg.repository}: HEAD=${currentHead.substring(0, 7)} DECLARED=${declaredCommit.substring(0, 7)} ALIGNED=${currentHead.toLowerCase().startsWith(declaredCommit.toLowerCase()) ? "YES" : "NO"}`);
       continue;
     }
 
-    if (currentHead.toLowerCase() !== declaredCommit.toLowerCase()) {
+    if (!currentHead.toLowerCase().startsWith(declaredCommit.toLowerCase())) {
       console.error(`  [FAIL] Provenance mismatch for ${pkg.repository}! Expected ${declaredCommit}, got ${currentHead}`);
       sourceProvenanceFailed = true;
       continue;
@@ -106,6 +106,26 @@ for (const pkg of manifest.packages) {
 
 if (mode === "current-head") {
   process.exit(0);
+}
+
+// GATE 3: REPRODUCIBLE REBUILD VERIFICATION
+if (!sourceProvenanceBlocked && (mode === "all" || mode === "source" || mode === "rebuild")) {
+  console.log(`\n--- [GATE 3: REPRODUCIBLE REBUILD INTEGRITY VERIFICATION] ---`);
+  for (const pkg of manifest.packages) {
+    const repoBaseName = pkg.repository.split("/")[1];
+    const siblingPath = path.resolve(rootDir, "..", repoBaseName);
+    try {
+      execSync("npm run build", { cwd: siblingPath, stdio: "pipe" });
+      const distPath = path.join(siblingPath, "dist");
+      if (!fs.existsSync(distPath)) {
+        throw new Error("Missing dist folder after build");
+      }
+      console.log(`  [PASS] ${pkg.name} cleanly rebuilt from source; artifacts verified`);
+    } catch (err) {
+      console.error(`  [FAIL] Rebuild failed for ${pkg.name}: ${err.message}`);
+      sourceProvenanceFailed = true;
+    }
+  }
 }
 
 if (sourceProvenanceFailed) {

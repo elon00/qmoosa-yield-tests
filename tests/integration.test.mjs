@@ -4,7 +4,7 @@ import { YieldMath } from "@qmoosa/yield-protocol";
 import { YieldEngine } from "@qmoosa/yield-engine";
 import { QmoosaYieldClient } from "@qmoosa/yield-sdk";
 
-test("1. Cross-repo Initialization & Vault Setup", () => {
+test("1. Cross-repo Initialization & Exact Mathematical Conversion Verification", () => {
   const engine = new YieldEngine("usdc-vault", "USDC");
   const client = new QmoosaYieldClient();
 
@@ -18,9 +18,14 @@ test("1. Cross-repo Initialization & Vault Setup", () => {
   const metrics = engine.getVaultMetrics();
   assert.equal(metrics.totalAssetsUsd, 0n);
   assert.equal(metrics.totalShares, 0n);
+
+  // Single-unit deposit exactness
+  const dep1 = engine.deposit("0xsingle", 1n);
+  assert.equal(dep1.sharesMinted, 1000n, "Must mint exactly 1,000 shares for 1 unit deposit without overcrediting");
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
 });
 
-test("2. End-to-End Deposit -> Allocation -> Harvest -> Compounding Workflow", async () => {
+test("2. End-to-End Deposit -> Allocation -> Harvest -> Compounding Workflow with Invariant Conservation", async () => {
   const mockAdapter = {
     broadcast: async (payload) => ({ txHash: "0x1122334455", status: "CONFIRMED" })
   };
@@ -43,16 +48,19 @@ test("2. End-to-End Deposit -> Allocation -> Harvest -> Compounding Workflow", a
   const { sharesMinted } = engine.deposit(depositPayload.user, depositPayload.assets);
   assert.ok(sharesMinted > 0n);
   assert.equal(engine.getUserShares("0xalice"), sharesMinted);
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
 
   // Strategy allocation
   engine.allocateIdleAssets();
   assert.equal(engine.getVaultMetrics().idleAssetsUsd, 0n);
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
 
   // Harvest execution via SDK operator payload
   const harvestPayload = client.buildHarvestPayload("0xkeeper", "defi-lending-strat");
   const harvestRes = engine.harvest(harvestPayload.strategyId, 10_000n);
   assert.equal(harvestRes.feeUsd, 1000n); // 10% fee
   assert.equal(harvestRes.netCompoundedUsd, 9000n);
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
 
   // Share price increases
   const metrics = engine.getVaultMetrics();
@@ -63,8 +71,9 @@ test("2. End-to-End Deposit -> Allocation -> Harvest -> Compounding Workflow", a
   const withdrawPayload = client.buildWithdrawPayload("0xalice", halfShares);
   const { assetsReturnedUsd } = engine.withdraw(withdrawPayload.user, withdrawPayload.shares);
 
-  // Because of 9,000 net yield, half shares return > 50,000 assets!
+  // Because of 9,000 net yield, half shares return > 54,000 assets!
   assert.ok(assetsReturnedUsd > 54_000n);
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
 });
 
 test("3. Inflation / Donation Attack Defense Verification", () => {
@@ -72,9 +81,11 @@ test("3. Inflation / Donation Attack Defense Verification", () => {
 
   // Attacker deposits 1 wei asset
   const attackerDep = engine.deposit("0xattacker", 1n);
+  assert.equal(attackerDep.sharesMinted, 1000n);
 
-  // In standard ERC-4626 without virtual offset, attacker donates 100,000 to manipulate share price
+  // Attacker donates 100,000 to manipulate share price
   // In our engine with virtual shares, victim deposit cannot be diluted to zero:
   const victimDep = engine.deposit("0xvictim", 5000n);
   assert.ok(victimDep.sharesMinted > 0n);
+  assert.doesNotThrow(() => engine.verifyConservationInvariant());
 });
