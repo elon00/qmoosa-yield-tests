@@ -1,0 +1,30 @@
+{
+  "name": "@qmoosa/yield-tests",
+  "version": "1.0.0",
+  "description": "Automated Yield Aggregation & Vaults — Multi-repo integration harness, inflation attack defense & provenance suite",
+  "type": "module",
+  "scripts": {
+    "test:integrity": "node scripts/verify-source-integrity.mjs",
+    "test:integration": "node --test tests/integration.test.mjs",
+    "test:negative": "node --test tests/negative-control.test.mjs",
+    "verify:archive": "node scripts/verify-source-integrity.mjs --mode=archive",
+    "verify:source": "node scripts/verify-source-integrity.mjs --mode=source",
+    "verify:current-head": "node scripts/verify-source-integrity.mjs --mode=current-head",
+    "test": "npm run test:integrity && npm run test:integration && npm run test:negative",
+    "lint": "node --check tests/integration.test.mjs tests/negative-control.test.mjs scripts/verify-source-integrity.mjs"
+  },
+  "dependencies": {
+    "@qmoosa/yield-engine": "file:packages/qmoosa-yield-engine-1.0.0.tgz",
+    "@qmoosa/yield-protocol": "file:packages/qmoosa-yield-protocol-1.0.0.tgz",
+    "@qmoosa/yield-sdk": "file:packages/qmoosa-yield-sdk-1.0.0.tgz"
+  },
+  "keywords": [
+    "qmoosa",
+    "yield",
+    "tests",
+    "integration",
+    "reality-gates"
+  ],
+  "author": "elon00",
+  "license": "MIT"
+}
