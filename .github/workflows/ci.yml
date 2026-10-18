@@ -43,6 +43,12 @@ jobs:
           cache: 'npm'
           cache-dependency-path: qmoosa-yield-tests/package-lock.json
 
+      - name: Install dependencies in sibling repositories
+        run: |
+          npm ci --prefix qmoosa-yield-protocol
+          npm ci --prefix qmoosa-yield-engine
+          npm ci --prefix qmoosa-yield-sdk
+
       - name: Install dependencies in tests repository
         working-directory: qmoosa-yield-tests
         run: npm install
