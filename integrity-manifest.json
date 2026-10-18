@@ -1,6 +1,6 @@
 {
   "mission": "QMOOSA-YIELD-01",
-  "generatedAt": "2026-10-17T21:22:00Z",
+  "generatedAt": "2026-10-18T09:14:00Z",
   "packages": [
     {
       "name": "@qmoosa/yield-protocol",
@@ -14,9 +14,9 @@
       "name": "@qmoosa/yield-engine",
       "version": "1.0.0",
       "archivePath": "packages/qmoosa-yield-engine-1.0.0.tgz",
-      "sha256": "1f46782d5efd60b62a47be958b3b36450a02eb9b5c614a96239603117215c9b3",
+      "sha256": "d5f7392c48fdf8a2f866274d57c543fda67bd02b063d28b91177a7868f3ede66",
       "repository": "elon00/qmoosa-yield-engine",
-      "sourceCommit": "f4bccc9"
+      "sourceCommit": "021a650"
     },
     {
       "name": "@qmoosa/yield-sdk",
