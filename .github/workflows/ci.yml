@@ -12,27 +12,57 @@ jobs:
     steps:
       - name: Checkout tests repository
         uses: actions/checkout@v4
+        with:
+          path: qmoosa-yield-tests
+
+      - name: Checkout protocol repository (Pinned Commit)
+        uses: actions/checkout@v4
+        with:
+          repository: elon00/qmoosa-yield-protocol
+          ref: fc1483290a15d7827a98caa0e80c636fd68d7b92
+          path: qmoosa-yield-protocol
+
+      - name: Checkout engine repository (Pinned Commit)
+        uses: actions/checkout@v4
+        with:
+          repository: elon00/qmoosa-yield-engine
+          ref: 021a6500c534665821f039bbcc36cc3a2a353804
+          path: qmoosa-yield-engine
+
+      - name: Checkout sdk repository (Pinned Commit)
+        uses: actions/checkout@v4
+        with:
+          repository: elon00/qmoosa-yield-sdk
+          ref: 916a5be3504287530a1831292f1133195b0dfd84
+          path: qmoosa-yield-sdk
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: qmoosa-yield-tests/package-lock.json
 
-      - name: Install dependencies with strict lockfile
+      - name: Install dependencies in tests repository
+        working-directory: qmoosa-yield-tests
         run: npm install
 
       - name: Run Source & Package Integrity Gate (Archive Mode)
+        working-directory: qmoosa-yield-tests
         run: npm run verify:archive
 
-      - name: Run Source & Package Integrity Gate (Full Gate)
+      - name: Run Source & Package Integrity Gate (Full Fail-Closed Gate)
+        working-directory: qmoosa-yield-tests
         run: npm run test:integrity
 
       - name: Run Real Cross-Repository Integration Suite
+        working-directory: qmoosa-yield-tests
         run: npm run test:integration
 
       - name: Run Negative Control & Adversarial Defense Suite
+        working-directory: qmoosa-yield-tests
         run: npm run test:negative
 
       - name: Run Static Syntax & Lint Verification
+        working-directory: qmoosa-yield-tests
         run: npm run lint
